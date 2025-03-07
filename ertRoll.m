@@ -4,19 +4,21 @@ clear all; close all; clc
 sep = 4; %enter electrode separation
 minVal = 0.0001; %minimum transfer resistance value to retain
 
+% import all files in the Data directory (only include the files you want merged
 files = dir([pwd '\data']);
 for i = 3:length(files) %start at 5 to ignore the non-data files
     d = importAGI([pwd '\data\' files(i).name]); %uses the nested function at the bottom of this script to import SuperSting
     data{i-2} = [(d(:,10)./sep)+1 (d(:,13)./sep)+1 (d(:,16)./sep)+1 (d(:,19)./sep)+1 d(:,5)];% A B M N R
     clear d
 end
-data(cellfun(@isempty,data))=[];
+data(cellfun(@isempty,data))=[]; %just checks for empty cells and removes them
 
+%here we start to merge the datasets
 merged = data{1};
 for j = 1:length(data)
-    merged = [merged; data{j}];
+    merged = [merged; data{j}]; % concatenate the data
 end
-merged(:,1:4) = (merged(:,1:4)-min(min(merged(:,1:4))))+1;
+merged(:,1:4) = (merged(:,1:4)-min(min(merged(:,1:4))))+1; %set first electrode to 1
 
 %% clen up negative or NaN values
 dat_a = sortrows(merged,5); %sort based on coluclcm that will have NaNs
